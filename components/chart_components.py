@@ -22,9 +22,12 @@ class ChartComponent:
         """Create a candlestick chart with technical indicators"""
         self.fig = go.Figure()
         
+        # Create continuous index to remove weekend gaps
+        continuous_index = list(range(len(data)))
+        
         # Add candlestick trace with dark theme colors
         self.fig.add_trace(go.Candlestick(
-            x=data['Datetime'],
+            x=continuous_index,
             open=data['Open'],
             high=data['High'],
             low=data['Low'],
@@ -38,10 +41,10 @@ class ChartComponent:
         
         # Add technical indicators
         if indicators:
-            self._add_technical_indicators(data, indicators)
+            self._add_technical_indicators(data, indicators, continuous_index)
         
         # Update layout with dark theme
-        self._update_layout(ticker, time_period, dark_theme=True)
+        self._update_layout(ticker, time_period, dark_theme=True, data=data, continuous_index=continuous_index)
         
         return self.fig
     
@@ -50,9 +53,12 @@ class ChartComponent:
         """Create a line chart with technical indicators"""
         self.fig = go.Figure()
         
+        # Create continuous index to remove weekend gaps
+        continuous_index = list(range(len(data)))
+        
         # Add price line with dark theme color
         self.fig.add_trace(go.Scatter(
-            x=data['Datetime'],
+            x=continuous_index,
             y=data['Close'],
             mode='lines',
             name='Close Price',
@@ -61,14 +67,14 @@ class ChartComponent:
         
         # Add technical indicators
         if indicators:
-            self._add_technical_indicators(data, indicators)
+            self._add_technical_indicators(data, indicators, continuous_index)
         
         # Update layout with dark theme
-        self._update_layout(ticker, time_period, dark_theme=True)
+        self._update_layout(ticker, time_period, dark_theme=True, data=data, continuous_index=continuous_index)
         
         return self.fig
     
-    def _add_technical_indicators(self, data: pd.DataFrame, indicators: List[str]):
+    def _add_technical_indicators(self, data: pd.DataFrame, indicators: List[str], continuous_index: List[int]):
         """Add technical indicators to the chart with dark theme colors"""
         colors = {
             'SMA 20': '#00d4aa',  # Changed from orange to green
@@ -81,7 +87,7 @@ class ChartComponent:
         for indicator in indicators:
             if indicator == 'SMA 20' and 'SMA_20' in data.columns:
                 self.fig.add_trace(go.Scatter(
-                    x=data['Datetime'],
+                    x=continuous_index,
                     y=data['SMA_20'],
                     mode='lines',
                     name='SMA 20',
@@ -91,7 +97,7 @@ class ChartComponent:
             
             elif indicator == 'EMA 20' and 'EMA_20' in data.columns:
                 self.fig.add_trace(go.Scatter(
-                    x=data['Datetime'],
+                    x=continuous_index,
                     y=data['EMA_20'],
                     mode='lines',
                     name='EMA 20',
@@ -101,7 +107,7 @@ class ChartComponent:
             
             elif indicator == 'RSI 14' and 'RSI_14' in data.columns:
                 self.fig.add_trace(go.Scatter(
-                    x=data['Datetime'],
+                    x=continuous_index,
                     y=data['RSI_14'],
                     mode='lines',
                     name='RSI 14',
@@ -112,7 +118,7 @@ class ChartComponent:
             
             elif indicator == 'MACD' and 'MACD' in data.columns:
                 self.fig.add_trace(go.Scatter(
-                    x=data['Datetime'],
+                    x=continuous_index,
                     y=data['MACD'],
                     mode='lines',
                     name='MACD',
@@ -122,7 +128,7 @@ class ChartComponent:
                 
                 if 'MACD_Signal' in data.columns:
                     self.fig.add_trace(go.Scatter(
-                        x=data['Datetime'],
+                        x=continuous_index,
                         y=data['MACD_Signal'],
                         mode='lines',
                         name='MACD Signal',
@@ -133,7 +139,7 @@ class ChartComponent:
             elif indicator == 'Bollinger Bands' and 'BB_Upper' in data.columns:
                 # Upper band
                 self.fig.add_trace(go.Scatter(
-                    x=data['Datetime'],
+                    x=continuous_index,
                     y=data['BB_Upper'],
                     mode='lines',
                     name='BB Upper',
@@ -145,7 +151,7 @@ class ChartComponent:
                 # Lower band
                 if 'BB_Lower' in data.columns:
                     self.fig.add_trace(go.Scatter(
-                        x=data['Datetime'],
+                        x=continuous_index,
                         y=data['BB_Lower'],
                         mode='lines',
                         name='BB Lower',
@@ -159,7 +165,7 @@ class ChartComponent:
                 # Middle band
                 if 'BB_Middle' in data.columns:
                     self.fig.add_trace(go.Scatter(
-                        x=data['Datetime'],
+                        x=continuous_index,
                         y=data['BB_Middle'],
                         mode='lines',
                         name='BB Middle',
@@ -167,7 +173,7 @@ class ChartComponent:
                         opacity=0.6
                     ))
     
-    def _update_layout(self, ticker: str, time_period: str, dark_theme: bool = True):
+    def _update_layout(self, ticker: str, time_period: str, dark_theme: bool = True, data: pd.DataFrame = None, continuous_index: List[int] = None):
         """Update chart layout with dark theme"""
         if dark_theme:
             # Dark theme colors
@@ -228,22 +234,52 @@ class ChartComponent:
             )
         )
         
-        # Update x-axis
-        self.fig.update_xaxes(
-            rangeslider_visible=False,
-            rangeselector=dict(
-                buttons=list([
-                    dict(count=1, label="1D", step="day", stepmode="backward"),
-                    dict(count=7, label="1W", step="day", stepmode="backward"),
-                    dict(count=1, label="1M", step="month", stepmode="backward"),
-                    dict(step="all")
-                ]),
-                bgcolor='rgba(42, 42, 42, 0.8)',  # Dark background
-                bordercolor='#333333',  # Dark border
-                borderwidth=1,
-                font=dict(color='#000000', size=12)  # Black text for visibility
+        # Update x-axis with continuous index and datetime labels
+        if data is not None and continuous_index is not None:
+            # Create tick positions and labels for the continuous index
+            tick_positions = continuous_index
+            tick_labels = [data['Datetime'].iloc[i].strftime('%b %d') for i in continuous_index]
+            
+            # Show only every nth label to avoid overcrowding
+            step = max(1, len(tick_positions) // 10)  # Show about 10 labels max
+            tick_positions = tick_positions[::step]
+            tick_labels = tick_labels[::step]
+            
+            self.fig.update_xaxes(
+                rangeslider_visible=False,
+                tickmode='array',
+                tickvals=tick_positions,
+                ticktext=tick_labels,
+                rangeselector=dict(
+                    buttons=list([
+                        dict(count=1, label="1D", step="day", stepmode="backward"),
+                        dict(count=7, label="1W", step="day", stepmode="backward"),
+                        dict(count=1, label="1M", step="month", stepmode="backward"),
+                        dict(step="all")
+                    ]),
+                    bgcolor='rgba(42, 42, 42, 0.8)',  # Dark background
+                    bordercolor='#333333',  # Dark border
+                    borderwidth=1,
+                    font=dict(color='#000000', size=12)  # Black text for visibility
+                )
             )
-        )
+        else:
+            # Fallback to original behavior
+            self.fig.update_xaxes(
+                rangeslider_visible=False,
+                rangeselector=dict(
+                    buttons=list([
+                        dict(count=1, label="1D", step="day", stepmode="backward"),
+                        dict(count=7, label="1W", step="day", stepmode="backward"),
+                        dict(count=1, label="1M", step="month", stepmode="backward"),
+                        dict(step="all")
+                    ]),
+                    bgcolor='rgba(42, 42, 42, 0.8)',  # Dark background
+                    bordercolor='#333333',  # Dark border
+                    borderwidth=1,
+                    font=dict(color='#000000', size=12)  # Black text for visibility
+                )
+            )
     
     def render(self, chart_type: str, data: pd.DataFrame, ticker: str, 
                time_period: str, indicators: List[str] = None):
@@ -365,14 +401,26 @@ class VolumeChartComponent:
         
         fig = go.Figure()
         
+        # Create continuous index to remove weekend gaps
+        continuous_index = list(range(len(data)))
+        
         # Add volume bars with dark theme colors
         fig.add_trace(go.Bar(
-            x=data['Datetime'],
+            x=continuous_index,
             y=data['Volume'],
             name='Volume',
             marker_color='#00d4aa',
             opacity=0.7
         ))
+        
+        # Create tick positions and labels for the continuous index
+        tick_positions = continuous_index
+        tick_labels = [data['Datetime'].iloc[i].strftime('%b %d') for i in continuous_index]
+        
+        # Show only every nth label to avoid overcrowding
+        step = max(1, len(tick_positions) // 10)  # Show about 10 labels max
+        tick_positions = tick_positions[::step]
+        tick_labels = tick_labels[::step]
         
         fig.update_layout(
             title=dict(
@@ -389,7 +437,10 @@ class VolumeChartComponent:
             font=dict(color='#ffffff'),
             xaxis=dict(
                 gridcolor='#333333',
-                color='#ffffff'
+                color='#ffffff',
+                tickmode='array',
+                tickvals=tick_positions,
+                ticktext=tick_labels
             ),
             yaxis=dict(
                 gridcolor='#333333',
