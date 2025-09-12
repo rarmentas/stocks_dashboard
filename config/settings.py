@@ -18,7 +18,7 @@ DEFAULT_TIME_PERIODS = ['1d', '5d', '1mo', '3mo', '6mo', '1y', '5y', 'max']
 
 # Chart settings
 CHART_TYPES = ['Candlestick', 'Line']
-TECHNICAL_INDICATORS = ['SMA 20', 'EMA 20', 'RSI 14', 'MACD', 'Bollinger Bands']
+TECHNICAL_INDICATORS = ['SMA 20', 'SMA 50', 'SMA 100', 'SMA 200', 'EMA 20', 'RSI 14', 'MACD', 'Bollinger Bands']
 
 # Interval mapping for different time periods
 INTERVAL_MAPPING = {

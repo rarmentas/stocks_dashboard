@@ -60,6 +60,8 @@ class TechnicalIndicatorsService:
                     data['BB_Lower'] = bb_data.bollinger_lband()
                 elif indicator == 'SMA_50':
                     data['SMA_50'] = ta.trend.sma_indicator(data['Close'], window=50)
+                elif indicator == 'SMA_100':
+                    data['SMA_100'] = ta.trend.sma_indicator(data['Close'], window=100)
                 elif indicator == 'SMA_200':
                     data['SMA_200'] = ta.trend.sma_indicator(data['Close'], window=200)
                 elif indicator == 'RSI_21':
@@ -84,6 +86,9 @@ class TechnicalIndicatorsService:
                     ticker=ticker,
                     datetime=row['Datetime'],
                     sma_20=float(row.get('SMA_20', 0)) if pd.notna(row.get('SMA_20')) else None,
+                    sma_50=float(row.get('SMA_50', 0)) if pd.notna(row.get('SMA_50')) else None,
+                    sma_100=float(row.get('SMA_100', 0)) if pd.notna(row.get('SMA_100')) else None,
+                    sma_200=float(row.get('SMA_200', 0)) if pd.notna(row.get('SMA_200')) else None,
                     ema_20=float(row.get('EMA_20', 0)) if pd.notna(row.get('EMA_20')) else None,
                     rsi_14=float(row.get('RSI_14', 0)) if pd.notna(row.get('RSI_14')) else None,
                     macd=float(row.get('MACD', 0)) if pd.notna(row.get('MACD')) else None,
@@ -120,6 +125,12 @@ class TechnicalIndicatorsService:
             # SMA/EMA
             if 'SMA_20' in data.columns and pd.notna(latest['SMA_20']):
                 summary['sma_20'] = float(latest['SMA_20'])
+            if 'SMA_50' in data.columns and pd.notna(latest['SMA_50']):
+                summary['sma_50'] = float(latest['SMA_50'])
+            if 'SMA_100' in data.columns and pd.notna(latest['SMA_100']):
+                summary['sma_100'] = float(latest['SMA_100'])
+            if 'SMA_200' in data.columns and pd.notna(latest['SMA_200']):
+                summary['sma_200'] = float(latest['SMA_200'])
             if 'EMA_20' in data.columns and pd.notna(latest['EMA_20']):
                 summary['ema_20'] = float(latest['EMA_20'])
             

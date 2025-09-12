@@ -18,7 +18,7 @@ class ChartComponent:
         self.fig = None
     
     def create_candlestick_chart(self, data: pd.DataFrame, ticker: str, 
-                                time_period: str, indicators: List[str] = None) -> go.Figure:
+                                time_period: str, indicators: List[str] = None, company_name: str = None) -> go.Figure:
         """Create a candlestick chart with technical indicators"""
         self.fig = go.Figure()
         
@@ -44,12 +44,12 @@ class ChartComponent:
             self._add_technical_indicators(data, indicators, continuous_index)
         
         # Update layout with dark theme
-        self._update_layout(ticker, time_period, dark_theme=True, data=data, continuous_index=continuous_index)
+        self._update_layout(ticker, time_period, dark_theme=True, data=data, continuous_index=continuous_index, company_name=company_name)
         
         return self.fig
     
     def create_line_chart(self, data: pd.DataFrame, ticker: str, 
-                         time_period: str, indicators: List[str] = None) -> go.Figure:
+                         time_period: str, indicators: List[str] = None, company_name: str = None) -> go.Figure:
         """Create a line chart with technical indicators"""
         self.fig = go.Figure()
         
@@ -70,14 +70,17 @@ class ChartComponent:
             self._add_technical_indicators(data, indicators, continuous_index)
         
         # Update layout with dark theme
-        self._update_layout(ticker, time_period, dark_theme=True, data=data, continuous_index=continuous_index)
+        self._update_layout(ticker, time_period, dark_theme=True, data=data, continuous_index=continuous_index, company_name=company_name)
         
         return self.fig
     
     def _add_technical_indicators(self, data: pd.DataFrame, indicators: List[str], continuous_index: List[int]):
         """Add technical indicators to the chart with dark theme colors"""
         colors = {
-            'SMA 20': '#00d4aa',  # Changed from orange to green
+            'SMA 20': '#00d4aa',  # Green
+            'SMA 50': '#ff7f0e',  # Orange
+            'SMA 100': '#2ca02c', # Dark green
+            'SMA 200': '#d62728', # Red
             'EMA 20': '#00d4aa',
             'RSI 14': '#e74c3c',
             'MACD': '#9b59b6',
@@ -92,6 +95,36 @@ class ChartComponent:
                     mode='lines',
                     name='SMA 20',
                     line=dict(color=colors.get('SMA 20', '#ff7f0e'), width=1),
+                    opacity=0.8
+                ))
+            
+            elif indicator == 'SMA 50' and 'SMA_50' in data.columns:
+                self.fig.add_trace(go.Scatter(
+                    x=continuous_index,
+                    y=data['SMA_50'],
+                    mode='lines',
+                    name='SMA 50',
+                    line=dict(color=colors.get('SMA 50', '#ff7f0e'), width=1),
+                    opacity=0.8
+                ))
+            
+            elif indicator == 'SMA 100' and 'SMA_100' in data.columns:
+                self.fig.add_trace(go.Scatter(
+                    x=continuous_index,
+                    y=data['SMA_100'],
+                    mode='lines',
+                    name='SMA 100',
+                    line=dict(color=colors.get('SMA 100', '#2ca02c'), width=1),
+                    opacity=0.8
+                ))
+            
+            elif indicator == 'SMA 200' and 'SMA_200' in data.columns:
+                self.fig.add_trace(go.Scatter(
+                    x=continuous_index,
+                    y=data['SMA_200'],
+                    mode='lines',
+                    name='SMA 200',
+                    line=dict(color=colors.get('SMA 200', '#d62728'), width=1),
                     opacity=0.8
                 ))
             
@@ -173,7 +206,7 @@ class ChartComponent:
                         opacity=0.6
                     ))
     
-    def _update_layout(self, ticker: str, time_period: str, dark_theme: bool = True, data: pd.DataFrame = None, continuous_index: List[int] = None):
+    def _update_layout(self, ticker: str, time_period: str, dark_theme: bool = True, data: pd.DataFrame = None, continuous_index: List[int] = None, company_name: str = None):
         """Update chart layout with dark theme"""
         if dark_theme:
             # Dark theme colors
@@ -188,9 +221,15 @@ class ChartComponent:
             text_color = '#000000'
             title_color = '#1f77b4'
         
+        # Generate title based on company name availability
+        if company_name:
+            title_text = f"{company_name} ({ticker})"
+        else:
+            title_text = f"{ticker} {time_period.upper()} Chart"
+        
         self.fig.update_layout(
             title=dict(
-                text=f"{ticker} {time_period.upper()} Chart",
+                text=title_text,
                 font=dict(color=title_color, size=20)
             ),
             xaxis_title='Time',
@@ -282,7 +321,7 @@ class ChartComponent:
             )
     
     def render(self, chart_type: str, data: pd.DataFrame, ticker: str, 
-               time_period: str, indicators: List[str] = None):
+               time_period: str, indicators: List[str] = None, company_name: str = None):
         """Render the chart based on type"""
         if data.empty:
             st.warning("No data available for chart")
@@ -290,9 +329,9 @@ class ChartComponent:
         
         try:
             if chart_type == 'Candlestick':
-                fig = self.create_candlestick_chart(data, ticker, time_period, indicators)
+                fig = self.create_candlestick_chart(data, ticker, time_period, indicators, company_name)
             else:
-                fig = self.create_line_chart(data, ticker, time_period, indicators)
+                fig = self.create_line_chart(data, ticker, time_period, indicators, company_name)
             
             st.plotly_chart(fig, use_container_width=True)
             
@@ -318,6 +357,24 @@ class IndicatorSummaryComponent:
                 st.metric(
                     label='SMA 20',
                     value=f"{indicator_summary['sma_20']:.2f}"
+                )
+            
+            if 'sma_50' in indicator_summary:
+                st.metric(
+                    label='SMA 50',
+                    value=f"{indicator_summary['sma_50']:.2f}"
+                )
+            
+            if 'sma_100' in indicator_summary:
+                st.metric(
+                    label='SMA 100',
+                    value=f"{indicator_summary['sma_100']:.2f}"
+                )
+            
+            if 'sma_200' in indicator_summary:
+                st.metric(
+                    label='SMA 200',
+                    value=f"{indicator_summary['sma_200']:.2f}"
                 )
             
             if 'ema_20' in indicator_summary:

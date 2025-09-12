@@ -57,6 +57,9 @@ class DatabaseManager:
                     ticker TEXT NOT NULL,
                     datetime TIMESTAMP NOT NULL,
                     sma_20 REAL,
+                    sma_50 REAL,
+                    sma_100 REAL,
+                    sma_200 REAL,
                     ema_20 REAL,
                     rsi_14 REAL,
                     macd REAL,
@@ -107,6 +110,26 @@ class DatabaseManager:
                 CREATE INDEX IF NOT EXISTS idx_watchlist_active_priority 
                 ON watchlist_tickers(is_active, priority)
             """)
+            
+            conn.commit()
+            
+            # Run migrations for existing databases
+            self._run_migrations()
+    
+    def _run_migrations(self):
+        """Run database migrations for schema updates"""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            
+            # Check if new SMA columns exist, if not add them
+            cursor.execute("PRAGMA table_info(technical_indicators)")
+            columns = [column[1] for column in cursor.fetchall()]
+            
+            new_columns = ['sma_50', 'sma_100', 'sma_200']
+            for column in new_columns:
+                if column not in columns:
+                    cursor.execute(f"ALTER TABLE technical_indicators ADD COLUMN {column} REAL")
+                    logging.info(f"Added column {column} to technical_indicators table")
             
             conn.commit()
     
@@ -272,6 +295,177 @@ class DatabaseManager:
         except Exception as e:
             logger.error(f"Error clearing old data: {e}")
     
+    # Watchlist methods
+    def add_watchlist_ticker(self, watchlist_ticker: WatchlistTicker) -> bool:
+        """Add a ticker to the watchlist"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                
+                cursor.execute("""
+                    INSERT INTO watchlist_tickers 
+                    (ticker, company_name, sector, added_date, notes, target_price, 
+                     stop_loss, is_active, priority, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    watchlist_ticker.ticker,
+                    watchlist_ticker.company_name,
+                    watchlist_ticker.sector,
+                    watchlist_ticker.added_date,
+                    watchlist_ticker.notes,
+                    watchlist_ticker.target_price,
+                    watchlist_ticker.stop_loss,
+                    watchlist_ticker.is_active,
+                    watchlist_ticker.priority,
+                    watchlist_ticker.created_at,
+                    watchlist_ticker.updated_at
+                ))
+                
+                conn.commit()
+                return True
+                
+        except Exception as e:
+            logger.error(f"Error adding watchlist ticker: {e}")
+            return False
+    
+    def get_watchlist_tickers(self, active_only: bool = True) -> List[WatchlistTicker]:
+        """Get all tickers from watchlist"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                
+                query = """
+                    SELECT ticker, company_name, sector, added_date, notes, 
+                           target_price, stop_loss, is_active, priority, 
+                           created_at, updated_at
+                    FROM watchlist_tickers
+                """
+                
+                if active_only:
+                    query += " WHERE is_active = 1"
+                
+                query += " ORDER BY priority ASC, added_date DESC"
+                
+                cursor.execute(query)
+                rows = cursor.fetchall()
+                
+                watchlist_tickers = []
+                for row in rows:
+                    # Convert string dates to datetime objects
+                    added_date = None
+                    created_at = None
+                    updated_at = None
+                    
+                    if row[3]:  # added_date
+                        try:
+                            added_date = datetime.fromisoformat(row[3].replace('Z', '+00:00'))
+                        except (ValueError, AttributeError):
+                            added_date = None
+                    
+                    if row[9]:  # created_at
+                        try:
+                            created_at = datetime.fromisoformat(row[9].replace('Z', '+00:00'))
+                        except (ValueError, AttributeError):
+                            created_at = None
+                    
+                    if row[10]:  # updated_at
+                        try:
+                            updated_at = datetime.fromisoformat(row[10].replace('Z', '+00:00'))
+                        except (ValueError, AttributeError):
+                            updated_at = None
+                    
+                    ticker = WatchlistTicker(
+                        ticker=row[0],
+                        company_name=row[1],
+                        sector=row[2],
+                        added_date=added_date,
+                        notes=row[4],
+                        target_price=row[5],
+                        stop_loss=row[6],
+                        is_active=bool(row[7]),
+                        priority=row[8],
+                        created_at=created_at,
+                        updated_at=updated_at
+                    )
+                    watchlist_tickers.append(ticker)
+                
+                return watchlist_tickers
+                
+        except Exception as e:
+            logger.error(f"Error getting watchlist tickers: {e}")
+            return []
+    
+    def is_ticker_in_watchlist(self, ticker: str) -> bool:
+        """Check if a ticker is already in the watchlist"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                
+                cursor.execute("""
+                    SELECT COUNT(*) FROM watchlist_tickers 
+                    WHERE ticker = ? AND is_active = 1
+                """, (ticker,))
+                
+                count = cursor.fetchone()[0]
+                return count > 0
+                
+        except Exception as e:
+            logger.error(f"Error checking if ticker in watchlist: {e}")
+            return False
+    
+    def remove_watchlist_ticker(self, ticker: str) -> bool:
+        """Remove a ticker from the watchlist (set is_active to False)"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                
+                cursor.execute("""
+                    UPDATE watchlist_tickers 
+                    SET is_active = 0, updated_at = CURRENT_TIMESTAMP
+                    WHERE ticker = ?
+                """, (ticker,))
+                
+                conn.commit()
+                return cursor.rowcount > 0
+                
+        except Exception as e:
+            logger.error(f"Error removing watchlist ticker: {e}")
+            return False
+    
+    def update_watchlist_ticker(self, ticker: str, **kwargs) -> bool:
+        """Update a ticker in the watchlist"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                
+                # Build dynamic update query
+                set_clauses = []
+                values = []
+                
+                for key, value in kwargs.items():
+                    if key in ['notes', 'target_price', 'stop_loss', 'priority', 'is_active', 'updated_at']:
+                        set_clauses.append(f"{key} = ?")
+                        values.append(value)
+                
+                if not set_clauses:
+                    return False
+                
+                values.append(ticker)
+                
+                query = f"""
+                    UPDATE watchlist_tickers 
+                    SET {', '.join(set_clauses)}
+                    WHERE ticker = ?
+                """
+                
+                cursor.execute(query, values)
+                conn.commit()
+                return cursor.rowcount > 0
+                
+        except Exception as e:
+            logger.error(f"Error updating watchlist ticker: {e}")
+            return False
+    
     def get_database_stats(self) -> Dict[str, Any]:
         """Get database statistics"""
         try:
@@ -285,6 +479,9 @@ class DatabaseManager:
                 cursor.execute("SELECT COUNT(*) FROM technical_indicators")
                 indicators_count = cursor.fetchone()[0]
                 
+                cursor.execute("SELECT COUNT(*) FROM watchlist_tickers WHERE is_active = 1")
+                watchlist_count = cursor.fetchone()[0]
+                
                 # Get unique tickers
                 cursor.execute("SELECT DISTINCT ticker FROM stock_data")
                 tickers = [row[0] for row in cursor.fetchall()]
@@ -292,6 +489,7 @@ class DatabaseManager:
                 return {
                     'stock_data_records': stock_data_count,
                     'indicators_records': indicators_count,
+                    'watchlist_records': watchlist_count,
                     'unique_tickers': len(tickers),
                     'tickers': tickers,
                     'database_size_mb': self.db_path.stat().st_size / (1024 * 1024) if self.db_path.exists() else 0
@@ -300,3 +498,21 @@ class DatabaseManager:
         except Exception as e:
             logger.error(f"Error getting database stats: {e}")
             return {}
+    
+    def get_company_name(self, ticker: str) -> Optional[str]:
+        """Get company name for a ticker from the watchlist"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                
+                cursor.execute("""
+                    SELECT company_name FROM watchlist_tickers 
+                    WHERE ticker = ? AND is_active = 1
+                """, (ticker,))
+                
+                result = cursor.fetchone()
+                return result[0] if result else None
+                
+        except Exception as e:
+            logger.error(f"Error getting company name for {ticker}: {e}")
+            return None

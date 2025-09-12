@@ -16,25 +16,79 @@ from config.settings import (
 class SidebarComponent:
     """Component for the sidebar interface"""
     
-    def __init__(self):
+    def __init__(self, watchlist_service=None):
         # Don't initialize instance variables that will be set in render()
-        pass
+        self.watchlist_service = watchlist_service
     
     def render(self) -> Dict[str, Any]:
         """Render the sidebar and return user inputs"""
         st.sidebar.header('Chart Parameters')
         
-        # Ticker input - let Streamlit manage the state naturally
+        # Dynamic ticker selection - dropdown with watchlist + free text input
         # Initialize ticker in session state if not exists
         if 'current_ticker' not in st.session_state:
-            st.session_state.current_ticker = 'AAPL'
+            # Try to get the most recent ticker from watchlist, fallback to AAPL
+            default_ticker = 'AAPL'
+            if self.watchlist_service:
+                try:
+                    most_recent = self.watchlist_service.get_most_recent_ticker()
+                    if most_recent:
+                        default_ticker = most_recent
+                except Exception as e:
+                    # If there's an error getting the most recent ticker, use AAPL
+                    pass
+            st.session_state.current_ticker = default_ticker
         
-        self.ticker = st.sidebar.text_input(
-            'Ticker Symbol', 
-            value=st.session_state.current_ticker,
-            key='ticker_input_field',
-            help='Enter a valid stock ticker symbol (e.g., AAPL, GOOGL, MSFT)'
-        ).upper()
+        # Get watchlist tickers for dropdown
+        watchlist_tickers = []
+        if self.watchlist_service:
+            try:
+                watchlist_data = self.watchlist_service.get_watchlist_tickers(active_only=True)
+                watchlist_tickers = [ticker.ticker for ticker in watchlist_data]
+            except Exception as e:
+                # If there's an error getting watchlist, continue with empty list
+                pass
+        
+        # Create options list with watchlist tickers + "Enter new ticker..." option
+        # Add visual indicators for watchlist tickers
+        options = []
+        for ticker in watchlist_tickers:
+            options.append(f"📋 {ticker}")  # Add watchlist icon
+        options.append("➕ Enter new ticker...")  # Add new ticker icon
+        
+        # Find the current index for the selectbox
+        current_ticker = st.session_state.current_ticker
+        if current_ticker in watchlist_tickers:
+            current_index = watchlist_tickers.index(current_ticker)
+        else:
+            current_index = len(options) - 1  # "Enter new ticker..." option
+        
+        # Create the selectbox
+        selected_option = st.sidebar.selectbox(
+            'Ticker Symbol',
+            options=options,
+            index=current_index,
+            key='ticker_selectbox',
+            help='Select from your watchlist or choose "Enter new ticker..." to add a new one'
+        )
+        
+        # Handle the selection
+        if selected_option == "➕ Enter new ticker...":
+            # Show text input for new ticker
+            self.ticker = st.sidebar.text_input(
+                'Enter New Ticker Symbol',
+                value='',
+                key='new_ticker_input',
+                help='Enter a valid stock ticker symbol (e.g., AAPL, GOOGL, MSFT)',
+                placeholder='e.g., AAPL, GOOGL, MSFT'
+            ).upper()
+            
+            # If user entered something, use that; otherwise keep the last known ticker
+            if not self.ticker:
+                self.ticker = current_ticker
+        else:
+            # User selected a ticker from watchlist (remove the icon prefix)
+            self.ticker = selected_option.replace("📋 ", "")
         
         # Update session state with current ticker
         st.session_state.current_ticker = self.ticker
@@ -58,7 +112,7 @@ class SidebarComponent:
         self.indicators = st.sidebar.multiselect(
             'Technical Indicators',
             options=TECHNICAL_INDICATORS,
-            default=['SMA 20', 'EMA 20', 'RSI 14'],
+            default=['SMA 20', 'SMA 50', 'SMA 100', 'SMA 200'],
             help='Select technical indicators to display on the chart'
         )
         
@@ -234,7 +288,7 @@ class DataTableComponent:
         # Select indicator columns
         indicator_columns = ['Datetime']
         available_indicators = [
-            'SMA_20', 'EMA_20', 'RSI_14', 'MACD', 'MACD_Signal',
+            'SMA_20', 'SMA_50', 'SMA_100', 'SMA_200', 'EMA_20', 'RSI_14', 'MACD', 'MACD_Signal',
             'BB_Upper', 'BB_Middle', 'BB_Lower'
         ]
         
@@ -348,3 +402,134 @@ class AboutComponent:
         st.sidebar.markdown("""
         Data provided by [Yahoo Finance](https://finance.yahoo.com/)
         """)
+
+
+class WatchlistComponent:
+    """Component for displaying and managing watchlist"""
+    
+    def __init__(self):
+        pass
+    
+    def render_watchlist_summary(self, watchlist_summary: Dict[str, Any]):
+        """Render watchlist summary with statistics"""
+        if not watchlist_summary or watchlist_summary['total_tickers'] == 0:
+            st.info("📋 Your watchlist is empty. Add tickers using the Follow button!")
+            return
+        
+        st.subheader('📋 Watchlist Summary')
+        
+        # Create columns for summary metrics
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.metric(
+                label="Total Tickers",
+                value=watchlist_summary['total_tickers']
+            )
+        
+        with col2:
+            st.metric(
+                label="Sectors",
+                value=len(watchlist_summary['sectors'])
+            )
+        
+        with col3:
+            high_priority = sum(1 for p in watchlist_summary['priority_distribution'].items() if p[0] <= 2)
+            st.metric(
+                label="High Priority",
+                value=high_priority
+            )
+        
+        with col4:
+            avg_priority = sum(p * count for p, count in watchlist_summary['priority_distribution'].items()) / watchlist_summary['total_tickers']
+            st.metric(
+                label="Avg Priority",
+                value=f"{avg_priority:.1f}"
+            )
+    
+    def render_watchlist_table(self, watchlist_tickers: List[Any], data_service=None):
+        """Render watchlist table with real-time prices"""
+        if not watchlist_tickers:
+            return
+        
+        st.subheader('📊 Watchlist Tickers')
+        
+        # Get real-time prices for all tickers
+        ticker_symbols = [ticker.ticker for ticker in watchlist_tickers]
+        real_time_data = {}
+        
+        if data_service:
+            real_time_data = data_service.get_real_time_prices(ticker_symbols)
+        
+        # Create display data
+        display_data = []
+        for ticker in watchlist_tickers:
+            ticker_data = real_time_data.get(ticker.ticker, {})
+            
+            # Priority emoji
+            priority_emoji = {
+                1: '🔴',  # High
+                2: '🟠',  # Medium-High
+                3: '🟡',  # Medium
+                4: '🟢',  # Low
+                5: '⚪'   # Very Low
+            }.get(ticker.priority, '🟡')
+            
+            display_data.append({
+                'Ticker': ticker.ticker,
+                'Company': ticker.company_name,
+                'Sector': ticker.sector or 'Unknown',
+                'Priority': f"{priority_emoji} {ticker.priority}",
+                'Current Price': f"${ticker_data.get('price', 0):.2f}" if ticker_data.get('price', 0) > 0 else 'N/A',
+                'Change': f"{ticker_data.get('pct_change', 0):+.2f}%" if ticker_data.get('pct_change') is not None else 'N/A',
+                'Target': f"${ticker.target_price:.2f}" if ticker.target_price else 'N/A',
+                'Stop Loss': f"${ticker.stop_loss:.2f}" if ticker.stop_loss else 'N/A',
+                'Added': ticker.added_date.strftime('%Y-%m-%d') if ticker.added_date and hasattr(ticker.added_date, 'strftime') else 'N/A',
+                'Notes': ticker.notes or ''
+            })
+        
+        # Create DataFrame and display
+        df = pd.DataFrame(display_data)
+        
+        # Style the DataFrame
+        def style_change(val):
+            if isinstance(val, str) and val != 'N/A':
+                if val.startswith('+'):
+                    return 'color: green'
+                elif val.startswith('-'):
+                    return 'color: red'
+            return ''
+        
+        styled_df = df.style.applymap(style_change, subset=['Change'])
+        st.dataframe(styled_df, use_container_width=True, height=400)
+    
+    def render_watchlist_management(self, watchlist_service, ticker_to_remove: str = None):
+        """Render watchlist management interface"""
+        st.subheader('⚙️ Manage Watchlist')
+        
+        # Remove ticker section
+        if ticker_to_remove:
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                st.write(f"Remove **{ticker_to_remove}** from watchlist?")
+            with col2:
+                if st.button('Confirm Remove', type='secondary'):
+                    result = watchlist_service.remove_ticker_from_watchlist(ticker_to_remove)
+                    if result['success']:
+                        st.success(result['message'])
+                        st.rerun()
+                    else:
+                        st.error(result['error'])
+        
+        # Bulk actions
+        st.write("**Bulk Actions:**")
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if st.button('Clear All Watchlist', type='secondary'):
+                st.warning("This will remove all tickers from your watchlist. Are you sure?")
+                # Note: This would need additional confirmation logic
+        
+        with col2:
+            if st.button('Export Watchlist', type='secondary'):
+                st.info("Export functionality will be implemented soon")

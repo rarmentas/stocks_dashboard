@@ -3,6 +3,22 @@
 /* Import Google Fonts for elegant typography */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+/* CRITICAL: Force uniform black background - highest priority */
+html, body, #root, .stApp, .stApp > div, .stApp > div > div, .stApp > div > div > div {
+    background: #0a0a0a !important;
+    background-color: #0a0a0a !important;
+}
+
+/* Override any Streamlit default green backgrounds immediately */
+div[style*="background-color: rgb(0, 212, 170)"],
+div[style*="background-color: #00d4aa"],
+div[style*="background: rgb(0, 212, 170)"],
+div[style*="background: #00d4aa"],
+div[style*="background: linear-gradient"] {
+    background: #0a0a0a !important;
+    background-color: #0a0a0a !important;
+}
+
 /* Root variables for consistent theming */
 :root {
     --primary-bg: #0a0a0a;
@@ -62,10 +78,48 @@ section[data-testid="stSidebar"] > div > div > div {
     max-width: 1200px;
 }
 
-/* Background */
+/* Background - Force uniform black background */
 .stApp {
-    background: var(--primary-bg);
+    background: var(--primary-bg) !important;
     color: var(--text-primary);
+}
+
+/* Override any green backgrounds from Streamlit defaults */
+.stApp > div,
+.stApp > div > div,
+.stApp > div > div > div,
+.stApp > div > div > div > div {
+    background: var(--primary-bg) !important;
+}
+
+/* Force black background on main content area */
+.main .block-container,
+.main .block-container > div,
+.main .block-container > div > div {
+    background: var(--primary-bg) !important;
+}
+
+/* Override any Streamlit default green backgrounds */
+div[data-testid="stAppViewContainer"],
+div[data-testid="stAppViewContainer"] > div,
+div[data-testid="stAppViewContainer"] > div > div {
+    background: var(--primary-bg) !important;
+}
+
+/* Target the main content wrapper */
+.css-1rs6os,
+.css-1rs6os > div,
+.css-1rs6os > div > div,
+.css-1rs6os > div > div > div {
+    background: var(--primary-bg) !important;
+}
+
+/* Override any green gradient backgrounds */
+div[style*="background: linear-gradient"],
+div[style*="background:linear-gradient"],
+div[style*="background-color: rgb(0, 212, 170)"],
+div[style*="background-color: #00d4aa"] {
+    background: var(--primary-bg) !important;
 }
 
 /* Fix the top white stripe */
@@ -1000,6 +1054,44 @@ div[data-testid="stDecoration"]::after,
     background: linear-gradient(90deg, #00d4aa 0%, #00b894 100%) !important;
 }
 
+/* Additional overrides for Streamlit's new default styling */
+/* Target any remaining green backgrounds */
+div[style*="background-color: rgb(0, 212, 170)"],
+div[style*="background-color: #00d4aa"],
+div[style*="background: rgb(0, 212, 170)"],
+div[style*="background: #00d4aa"] {
+    background: var(--primary-bg) !important;
+}
+
+/* Override Streamlit's main content area */
+.stApp > div:last-child,
+.stApp > div:last-child > div,
+.stApp > div:last-child > div > div {
+    background: var(--primary-bg) !important;
+}
+
+/* Target the main content area specifically */
+div[data-testid="stAppViewContainer"] > div:last-child,
+div[data-testid="stAppViewContainer"] > div:last-child > div {
+    background: var(--primary-bg) !important;
+}
+
+/* Override any inline styles with green backgrounds */
+*[style*="background-color: rgb(0, 212, 170)"],
+*[style*="background-color: #00d4aa"],
+*[style*="background: rgb(0, 212, 170)"],
+*[style*="background: #00d4aa"] {
+    background: var(--primary-bg) !important;
+}
+
+/* Force black background on all main content elements */
+.main,
+.main > div,
+.main > div > div,
+.main > div > div > div {
+    background: var(--primary-bg) !important;
+}
+
 /* Custom utility classes */
 .text-accent {
     color: var(--accent-color);
@@ -1031,4 +1123,11 @@ div[data-testid="stDecoration"]::after,
 /* Loading spinner customization */
 .stSpinner > div {
     border-color: var(--accent-color) transparent transparent transparent;
+}
+
+/* Hide only the Deploy button (more specific selectors) */
+button[title="Deploy this app"],
+button[aria-label="Deploy this app"],
+div[data-testid="stDeployButton"] {
+    display: none !important;
 }

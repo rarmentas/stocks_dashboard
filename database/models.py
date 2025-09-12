@@ -47,6 +47,9 @@ class TechnicalIndicators:
     ticker: str
     datetime: datetime
     sma_20: Optional[float] = None
+    sma_50: Optional[float] = None
+    sma_100: Optional[float] = None
+    sma_200: Optional[float] = None
     ema_20: Optional[float] = None
     rsi_14: Optional[float] = None
     macd: Optional[float] = None
@@ -61,6 +64,9 @@ class TechnicalIndicators:
             'ticker': self.ticker,
             'datetime': self.datetime,
             'sma_20': self.sma_20,
+            'sma_50': self.sma_50,
+            'sma_100': self.sma_100,
+            'sma_200': self.sma_200,
             'ema_20': self.ema_20,
             'rsi_14': self.rsi_14,
             'macd': self.macd,
