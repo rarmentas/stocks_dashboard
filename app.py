@@ -89,7 +89,7 @@ def main():
     sidebar_inputs = components['sidebar'].render()
     
     # Main dashboard content
-    st.title('Stock follow up')
+    # st.title('Stock follow up')  # Title removed
     
     # Check if follow button was clicked
     if sidebar_inputs.get('follow_clicked', False):
@@ -148,8 +148,8 @@ def main():
                 # Calculate basic metrics
                 metrics = data_service.calculate_basic_metrics(data)
                 
-                # Display metrics
-                components['metrics'].render(metrics, ticker)
+                # Display main metric (Last Price) above chart
+                components['metrics'].render_main_metric(metrics, ticker)
                 
                 # Create and display chart
                 components['chart'].render(
@@ -159,6 +159,9 @@ def main():
                     time_period=time_period,
                     indicators=indicators
                 )
+                
+                # Display additional metrics (High, Low, Volume) below chart
+                components['metrics'].render_additional_metrics(metrics)
                 
                 # Display volume chart
                 components['volume_chart'].render(data)

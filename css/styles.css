@@ -12,7 +12,7 @@
     --card-bg: #1f1f1f;
     --sidebar-bg: #111111;
     --text-primary: #ffffff;
-    --text-secondary: #b3b3b3;
+    --text-secondary: #00d4aa;
     --text-muted: #666666;
     --accent-color: #00d4aa;
     --accent-hover: #00b894;
@@ -454,8 +454,90 @@ h2 {
     font-weight: 700;
 }
 
-[data-testid="metric-container"] [data-testid="metric-label"] {
-    color: var(--text-secondary);
+/* Custom metric containers */
+.custom-metric-container {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.5rem;
+    margin: 0.15rem 0;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.custom-metric-container:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent-color);
+}
+
+/* Small square metric container for main price */
+.custom-metric-container-small {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.4rem;
+    margin: 0.15rem 0;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    text-align: center;
+    width: 120px;
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.custom-metric-container-small:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent-color);
+}
+
+.custom-metric-label {
+    color: #00d4aa !important;  /* Green color for metric labels */
+    font-size: 0.65rem;
+    font-weight: 500;
+    margin-bottom: 0.15rem;
+}
+
+.custom-metric-value {
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 0.1rem;
+}
+
+.custom-metric-value-small {
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-bottom: 0.05rem;
+    line-height: 1.1;
+}
+
+.custom-metric-delta {
+    font-size: 0.65rem;
+    font-weight: 600;
+}
+
+.custom-metric-delta-small {
+    font-size: 0.6rem;
+    font-weight: 600;
+    line-height: 1.1;
+}
+
+/* Multiple selectors to target metric labels */
+[data-testid="metric-container"] [data-testid="metric-label"],
+[data-testid="metric-container"] label,
+[data-testid="metric-container"] .metric-label,
+.stMetric > div > div:first-child,
+.stMetric label,
+div[data-testid="metric-container"] > div:first-child,
+/* Very broad selector for any text in metric containers */
+[data-testid="metric-container"] *:not([data-testid="metric-value"]):not([data-testid="metric-delta"]) {
+    color: #00d4aa !important;  /* Green color for metric labels */
     font-size: 0.9rem;
     font-weight: 500;
 }
@@ -829,8 +911,13 @@ section[data-testid="stSidebar"] [data-testid="metric-container"] [data-testid="
     color: var(--text-primary) !important;
 }
 
-section[data-testid="stSidebar"] [data-testid="metric-container"] [data-testid="metric-label"] {
-    color: var(--text-secondary) !important;
+/* Sidebar metric labels - multiple selectors */
+section[data-testid="stSidebar"] [data-testid="metric-container"] [data-testid="metric-label"],
+section[data-testid="stSidebar"] [data-testid="metric-container"] label,
+section[data-testid="stSidebar"] [data-testid="metric-container"] > div:first-child,
+section[data-testid="stSidebar"] .stMetric label,
+section[data-testid="stSidebar"] .stMetric > div > div:first-child {
+    color: #00d4aa !important;
 }
 
 /* Sidebar info boxes */

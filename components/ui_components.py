@@ -142,39 +142,61 @@ class SidebarComponent:
 class MetricsComponent:
     """Component for displaying stock metrics"""
     
-    def render(self, metrics: Dict[str, Any], ticker: str):
-        """Render the metrics section"""
+    def render_main_metric(self, metrics: Dict[str, Any], ticker: str):
+        """Render only the main price metric (above chart)"""
         if not metrics:
             st.warning("No metrics available")
             return
         
-        # Main price metric
-        st.metric(
-            label=f"{ticker} Last Price",
-            value=f"{metrics['last_close']:.2f} USD",
-            delta=f"{metrics['change']:.2f} ({metrics['pct_change']:.2f}%)"
-        )
+        # Custom HTML for main price metric without label - small square at left
+        delta_color = "#e74c3c" if metrics['change'] < 0 else "#00d4aa"
+        st.markdown(f"""
+        <div style="display: flex; align-items: flex-start;">
+            <div class="custom-metric-container-small">
+                <div class="custom-metric-value-small">{metrics['last_close']:.2f} USD</div>
+                <div class="custom-metric-delta-small" style="color: {delta_color}">
+                    {metrics['change']:+.2f} ({metrics['pct_change']:+.2f}%)
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    def render_additional_metrics(self, metrics: Dict[str, Any]):
+        """Render additional metrics (below chart)"""
+        if not metrics:
+            return
         
-        # Additional metrics in columns
+        # Additional metrics in columns with custom HTML
         col1, col2, col3 = st.columns(3)
         
         with col1:
-            st.metric(
-                label='High',
-                value=f"{metrics['high']:.2f} USD"
-            )
+            st.markdown(f"""
+            <div class="custom-metric-container">
+                <div class="custom-metric-label">High</div>
+                <div class="custom-metric-value">{metrics['high']:.2f} USD</div>
+            </div>
+            """, unsafe_allow_html=True)
         
         with col2:
-            st.metric(
-                label='Low',
-                value=f"{metrics['low']:.2f} USD"
-            )
+            st.markdown(f"""
+            <div class="custom-metric-container">
+                <div class="custom-metric-label">Low</div>
+                <div class="custom-metric-value">{metrics['low']:.2f} USD</div>
+            </div>
+            """, unsafe_allow_html=True)
         
         with col3:
-            st.metric(
-                label='Volume',
-                value=f"{metrics['volume']:,}"
-            )
+            st.markdown(f"""
+            <div class="custom-metric-container">
+                <div class="custom-metric-label">Volume</div>
+                <div class="custom-metric-value">{metrics['volume']:,}</div>
+            </div>
+            """, unsafe_allow_html=True)
+    
+    def render(self, metrics: Dict[str, Any], ticker: str):
+        """Render the metrics section (legacy method for backward compatibility)"""
+        self.render_main_metric(metrics, ticker)
+        self.render_additional_metrics(metrics)
 
 
 class DataTableComponent:
