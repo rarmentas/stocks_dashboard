@@ -17,23 +17,27 @@ class SidebarComponent:
     """Component for the sidebar interface"""
     
     def __init__(self):
-        self.ticker = None
-        self.time_period = None
-        self.chart_type = None
-        self.indicators = None
-        self.update_clicked = False
-        self.follow_clicked = False
+        # Don't initialize instance variables that will be set in render()
+        pass
     
     def render(self) -> Dict[str, Any]:
         """Render the sidebar and return user inputs"""
         st.sidebar.header('Chart Parameters')
         
-        # Ticker input
+        # Ticker input - let Streamlit manage the state naturally
+        # Initialize ticker in session state if not exists
+        if 'current_ticker' not in st.session_state:
+            st.session_state.current_ticker = 'AAPL'
+        
         self.ticker = st.sidebar.text_input(
             'Ticker Symbol', 
-            value='AAPL',
+            value=st.session_state.current_ticker,
+            key='ticker_input_field',
             help='Enter a valid stock ticker symbol (e.g., AAPL, GOOGL, MSFT)'
         ).upper()
+        
+        # Update session state with current ticker
+        st.session_state.current_ticker = self.ticker
         
         # Time period selection
         self.time_period = st.sidebar.selectbox(
@@ -62,17 +66,48 @@ class SidebarComponent:
         col1, col2 = st.sidebar.columns(2)
         
         with col1:
-            self.update_clicked = st.button(
+            # Use session state to track button clicks and current parameters
+            if 'update_clicked' not in st.session_state:
+                st.session_state.update_clicked = False
+            if 'last_ticker' not in st.session_state:
+                st.session_state.last_ticker = ''
+            if 'last_time_period' not in st.session_state:
+                st.session_state.last_time_period = ''
+            if 'last_chart_type' not in st.session_state:
+                st.session_state.last_chart_type = ''
+            if 'last_indicators' not in st.session_state:
+                st.session_state.last_indicators = []
+            
+            # Check if parameters have changed
+            params_changed = (
+                self.ticker != st.session_state.last_ticker or
+                self.time_period != st.session_state.last_time_period or
+                self.chart_type != st.session_state.last_chart_type or
+                set(self.indicators) != set(st.session_state.last_indicators)
+            )
+            
+            if st.button(
                 'Update Chart',
                 type='primary',
-                use_container_width=True
-            )
+                use_container_width=True,
+                key='update_chart_button'
+            ):
+                # Update session state with current parameters
+                st.session_state.last_ticker = self.ticker
+                st.session_state.last_time_period = self.time_period
+                st.session_state.last_chart_type = self.chart_type
+                st.session_state.last_indicators = self.indicators.copy()
+                st.session_state.update_clicked = True
+            
+            # Trigger update if parameters changed or button was clicked
+            self.update_clicked = st.session_state.update_clicked or params_changed
         
         with col2:
             self.follow_clicked = st.button(
                 'Follow',
                 type='secondary',
-                use_container_width=True
+                use_container_width=True,
+                key='follow_button'
             )
         
         # Additional options
@@ -88,6 +123,9 @@ class SidebarComponent:
             value=False,
             help='Display trading signals based on technical indicators'
         )
+        
+        # Debug: Print the values being returned
+        # st.write(f"DEBUG: Ticker value: '{self.ticker}', Update clicked: {self.update_clicked}")
         
         return {
             'ticker': self.ticker,

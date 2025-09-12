@@ -12,8 +12,7 @@ from database.database_manager import DatabaseManager
 from services.data_service import DataService
 from services.technical_indicators_service import TechnicalIndicatorsService
 from components.ui_components import (
-    SidebarComponent, MetricsComponent, DataTableComponent, 
-    RealTimePricesComponent, DatabaseStatsComponent, AboutComponent
+    SidebarComponent, MetricsComponent, DataTableComponent
 )
 from components.chart_components import (
     ChartComponent, IndicatorSummaryComponent, VolumeChartComponent
@@ -72,9 +71,6 @@ def initialize_components():
         'metrics': MetricsComponent(),
         'data_table': DataTableComponent(),
         'chart': ChartComponent(),
-        'real_time': RealTimePricesComponent(),
-        'db_stats': DatabaseStatsComponent(),
-        'about': AboutComponent(),
         'indicator_summary': IndicatorSummaryComponent(),
         'volume_chart': VolumeChartComponent()
     }
@@ -92,26 +88,6 @@ def main():
     # Render sidebar and get user inputs
     sidebar_inputs = components['sidebar'].render()
     
-    # Debug: Print available keys (remove this after testing)
-    # st.write("Available sidebar keys:", list(sidebar_inputs.keys()))
-    
-    # Render about section
-    components['about'].render()
-    
-    # Render database statistics
-    try:
-        db_stats = db_manager.get_database_stats()
-        components['db_stats'].render(db_stats)
-    except Exception as e:
-        logger.error(f"Error getting database stats: {e}")
-    
-    # Render real-time prices
-    try:
-        real_time_data = data_service.get_real_time_prices(DEFAULT_TICKERS)
-        components['real_time'].render(real_time_data)
-    except Exception as e:
-        logger.error(f"Error getting real-time prices: {e}")
-    
     # Main dashboard content
     st.title('Stock follow up')
     
@@ -119,7 +95,7 @@ def main():
     if sidebar_inputs.get('follow_clicked', False):
         st.info("🔔 Follow button clicked! This feature will be implemented soon.")
     
-    # Check if update button was clicked
+    # Check if update button was clicked or parameters changed
     if sidebar_inputs['update_clicked']:
         ticker = sidebar_inputs['ticker']
         time_period = sidebar_inputs['time_period']
@@ -127,6 +103,8 @@ def main():
         indicators = sidebar_inputs['indicators']
         use_cache = sidebar_inputs['use_cache']
         show_signals = sidebar_inputs['show_signals']
+        
+        # Processing ticker data
         
         if not ticker:
             st.error("Please enter a ticker symbol")
@@ -207,6 +185,9 @@ def main():
             except Exception as e:
                 logger.error(f"Error processing data for {ticker}: {e}")
                 st.error(f"Error processing data: {e}")
+            
+            # Reset the button state after processing
+            st.session_state.update_clicked = False
     
     else:
         # Show welcome message and instructions with custom styling

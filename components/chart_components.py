@@ -237,7 +237,11 @@ class ChartComponent:
                     dict(count=7, label="1W", step="day", stepmode="backward"),
                     dict(count=1, label="1M", step="month", stepmode="backward"),
                     dict(step="all")
-                ])
+                ]),
+                bgcolor='rgba(42, 42, 42, 0.8)',  # Dark background
+                bordercolor='#333333',  # Dark border
+                borderwidth=1,
+                font=dict(color='#000000', size=12)  # Black text for visibility
             )
         )
     

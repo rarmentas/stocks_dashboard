@@ -148,12 +148,13 @@ class DataService:
             logger.error(f"Error saving to cache: {e}")
     
     def get_real_time_prices(self, tickers: List[str]) -> Dict[str, Dict[str, Any]]:
-        """Get real-time prices for multiple tickers"""
+        """Get real-time prices for multiple tickers using cached data"""
         real_time_data = {}
         
         for ticker in tickers:
             try:
-                data = self.fetch_stock_data(ticker, '1d', '1m', use_cache=False)
+                # Use cached data to avoid API conflicts with main chart
+                data = self.fetch_stock_data(ticker, '1d', '1m', use_cache=True)
                 if data is not None and not data.empty:
                     last_price = float(data['Close'].iloc[-1])
                     first_price = float(data['Open'].iloc[0])
@@ -164,6 +165,13 @@ class DataService:
                         'price': last_price,
                         'change': change,
                         'pct_change': pct_change
+                    }
+                else:
+                    # Fallback to minimal data if no cached data available
+                    real_time_data[ticker] = {
+                        'price': 0.0,
+                        'change': 0.0,
+                        'pct_change': 0.0
                     }
                     
             except Exception as e:
