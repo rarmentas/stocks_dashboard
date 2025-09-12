@@ -582,6 +582,53 @@ h2 {
     line-height: 1.1;
 }
 
+/* Time frame cards styling */
+.timeframe-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.3rem 0.6rem;
+    margin: 0.1rem;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    text-align: center;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    min-width: 50px;
+}
+
+.timeframe-card:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent-color);
+    background: var(--tertiary-bg);
+}
+
+.timeframe-card-selected {
+    background: var(--accent-color);
+    border: 1px solid var(--accent-color);
+    border-radius: 6px;
+    padding: 0.3rem 0.6rem;
+    margin: 0.1rem;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    text-align: center;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--primary-bg);
+    min-width: 50px;
+}
+
+.timeframe-card-selected:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+}
+
 /* Multiple selectors to target metric labels */
 [data-testid="metric-container"] [data-testid="metric-label"],
 [data-testid="metric-container"] label,

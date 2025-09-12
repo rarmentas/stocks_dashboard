@@ -193,11 +193,108 @@ class SidebarComponent:
         }
 
 
+class TimeFrameCardComponent:
+    """Component for displaying time frame selection cards"""
+    
+    def __init__(self):
+        self.time_periods = DEFAULT_TIME_PERIODS
+    
+    def render_timeframe_cards(self, current_time_period: str = '1mo') -> str:
+        """Render time frame cards and return the selected time period"""
+        # Create a container for the time frame cards
+        st.markdown("""
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
+        """, unsafe_allow_html=True)
+        
+        # Create columns for the time frame cards
+        cols = st.columns(len(self.time_periods))
+        selected_period = current_time_period
+        
+        for i, period in enumerate(self.time_periods):
+            with cols[i]:
+                # Determine if this is the current selected period
+                is_selected = period == current_time_period
+                card_class = "timeframe-card-selected" if is_selected else "timeframe-card"
+                
+                # Create clickable card using st.button
+                if st.button(
+                    period,
+                    key=f"timeframe_{period}",
+                    help=f"View {period} chart",
+                    use_container_width=True
+                ):
+                    selected_period = period
+                    # Update session state to trigger chart refresh
+                    st.session_state.timeframe_card_clicked = True
+                    st.session_state.selected_timeframe = period
+        
+        st.markdown("</div>", unsafe_allow_html=True)
+        
+        return selected_period
+    
+    def render_timeframe_cards_standalone(self, current_time_period: str = '1mo'):
+        """Render time frame cards independently (for use outside chart update logic)"""
+        # Create a container for the time frame cards
+        st.markdown("""
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
+        """, unsafe_allow_html=True)
+        
+        # Create columns for the time frame cards
+        cols = st.columns(len(self.time_periods))
+        
+        for i, period in enumerate(self.time_periods):
+            with cols[i]:
+                # Determine if this is the current selected period
+                is_selected = period == current_time_period
+                
+                # Create clickable card using st.button
+                if st.button(
+                    period,
+                    key=f"timeframe_{period}",
+                    help=f"View {period} chart",
+                    use_container_width=True
+                ):
+                    # Update session state to trigger chart refresh
+                    st.session_state.timeframe_card_clicked = True
+                    st.session_state.selected_timeframe = period
+                    st.rerun()  # Force immediate rerun to process the click
+        
+        st.markdown("</div>", unsafe_allow_html=True)
+
+
 class MetricsComponent:
     """Component for displaying stock metrics"""
     
-    def render_main_metric(self, metrics: Dict[str, Any], ticker: str):
-        """Render only the main price metric (above chart)"""
+    def render_main_metric(self, metrics: Dict[str, Any], ticker: str, timeframe_component=None, current_time_period: str = '1mo'):
+        """Render the main price metric and time frame cards (above chart)"""
+        if not metrics:
+            st.warning("No metrics available")
+            return
+        
+        # Create a row with price card and time frame cards
+        col1, col2 = st.columns([1, 3])
+        
+        with col1:
+            # Custom HTML for main price metric without label - small square at left
+            delta_color = "#e74c3c" if metrics['change'] < 0 else "#00d4aa"
+            st.markdown(f"""
+            <div style="display: flex; align-items: flex-start;">
+                <div class="custom-metric-container-small">
+                    <div class="custom-metric-value-small">{metrics['last_close']:.2f} USD</div>
+                    <div class="custom-metric-delta-small" style="color: {delta_color}">
+                        {metrics['change']:+.2f} ({metrics['pct_change']:+.2f}%)
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            # Render time frame cards if component is provided
+            if timeframe_component:
+                timeframe_component.render_timeframe_cards(current_time_period)
+    
+    def render_price_card_only(self, metrics: Dict[str, Any], ticker: str):
+        """Render only the main price metric (without time frame cards)"""
         if not metrics:
             st.warning("No metrics available")
             return

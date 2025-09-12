@@ -14,7 +14,7 @@ from services.data_service import DataService
 from services.technical_indicators_service import TechnicalIndicatorsService
 from services.watchlist_service import WatchlistService
 from components.ui_components import (
-    SidebarComponent, MetricsComponent, DataTableComponent, WatchlistComponent
+    SidebarComponent, MetricsComponent, DataTableComponent, WatchlistComponent, TimeFrameCardComponent
 )
 from components.chart_components import (
     ChartComponent, IndicatorSummaryComponent, VolumeChartComponent
@@ -90,7 +90,8 @@ def initialize_components(watchlist_service=None):
         'chart': ChartComponent(),
         'indicator_summary': IndicatorSummaryComponent(),
         'volume_chart': VolumeChartComponent(),
-        'watchlist': WatchlistComponent()
+        'watchlist': WatchlistComponent(),
+        'timeframe_cards': TimeFrameCardComponent()
     }
 
 def render_main_dashboard(db_manager, data_service, indicators_service, watchlist_service, components):
@@ -126,10 +127,23 @@ def render_main_dashboard(db_manager, data_service, indicators_service, watchlis
                     logger.error(f"Error adding ticker {ticker} to watchlist: {e}")
                     st.error(f"Error adding ticker: {str(e)}")
     
+    # Check if time frame card was clicked
+    timeframe_card_clicked = st.session_state.get('timeframe_card_clicked', False)
+    selected_timeframe = st.session_state.get('selected_timeframe', None)
+    
+    # Get current time period (from sidebar or from timeframe card selection)
+    current_time_period = selected_timeframe if selected_timeframe else sidebar_inputs['time_period']
+    
+    # Render time frame cards outside the chart update logic so clicks can be detected
+    if 'current_ticker' in st.session_state and st.session_state.current_ticker:
+        # Only show time frame cards if we have a ticker
+        components['timeframe_cards'].render_timeframe_cards_standalone(current_time_period)
+    
     # Check if update button was clicked or parameters changed
-    if sidebar_inputs['update_clicked']:
+    if sidebar_inputs['update_clicked'] or timeframe_card_clicked:
         ticker = sidebar_inputs['ticker']
-        time_period = sidebar_inputs['time_period']
+        # Use selected timeframe from card if clicked, otherwise use sidebar selection
+        time_period = selected_timeframe if timeframe_card_clicked else sidebar_inputs['time_period']
         chart_type = sidebar_inputs['chart_type']
         indicators = sidebar_inputs['indicators']
         use_cache = sidebar_inputs['use_cache']
@@ -186,7 +200,7 @@ def render_main_dashboard(db_manager, data_service, indicators_service, watchlis
                 company_name = db_manager.get_company_name(ticker)
                 
                 # Display main metric (Last Price) above chart
-                components['metrics'].render_main_metric(metrics, ticker)
+                components['metrics'].render_price_card_only(metrics, ticker)
                 
                 # Create and display chart
                 components['chart'].render(
@@ -229,6 +243,7 @@ def render_main_dashboard(db_manager, data_service, indicators_service, watchlis
             
             # Reset the button state after processing
             st.session_state.update_clicked = False
+            st.session_state.timeframe_card_clicked = False
     
     else:
         # Show welcome message and instructions with custom styling
