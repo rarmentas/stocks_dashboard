@@ -1,0 +1,947 @@
+/* Dark Elegant Theme for Stock Dashboard */
+
+/* Import Google Fonts for elegant typography */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Root variables for consistent theming */
+:root {
+    --primary-bg: #0a0a0a;
+    --secondary-bg: #1a1a1a;
+    --tertiary-bg: #2a2a2a;
+    --accent-bg: #1e1e1e;
+    --card-bg: #1f1f1f;
+    --sidebar-bg: #111111;
+    --text-primary: #ffffff;
+    --text-secondary: #b3b3b3;
+    --text-muted: #666666;
+    --accent-color: #00d4aa;
+    --accent-hover: #00b894;
+    --success-color: #00d4aa;
+    --warning-color: #f39c12;
+    --error-color: #e74c3c;
+    --border-color: #333333;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
+    --gradient-primary: linear-gradient(135deg, #00d4aa 0%, #00b894 100%);
+    --gradient-secondary: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+}
+
+/* Global styles */
+* {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Force sidebar dark theme - most aggressive approach */
+.stApp > div:first-child,
+.stApp > div:first-child > div,
+.stApp > div:first-child > div > div,
+.stApp > div:first-child > div > div > div {
+    background-color: var(--sidebar-bg) !important;
+}
+
+/* Target all possible sidebar containers */
+div[data-testid="stSidebar"],
+div[data-testid="stSidebar"] > div,
+div[data-testid="stSidebar"] > div > div,
+div[data-testid="stSidebar"] > div > div > div {
+    background-color: var(--sidebar-bg) !important;
+}
+
+/* Override any white backgrounds in the entire sidebar */
+section[data-testid="stSidebar"],
+section[data-testid="stSidebar"] > div,
+section[data-testid="stSidebar"] > div > div,
+section[data-testid="stSidebar"] > div > div > div {
+    background-color: var(--sidebar-bg) !important;
+}
+
+/* Main app container */
+.main .block-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    max-width: 1200px;
+}
+
+/* Background */
+.stApp {
+    background: var(--primary-bg);
+    color: var(--text-primary);
+}
+
+/* Fix the top white stripe */
+.stApp > header {
+    background-color: var(--primary-bg) !important;
+}
+
+.stApp > header > div {
+    background-color: var(--primary-bg) !important;
+}
+
+/* Target the top navigation/header area */
+.css-1rs6os {
+    background-color: var(--primary-bg) !important;
+}
+
+.css-1rs6os > div {
+    background-color: var(--primary-bg) !important;
+}
+
+/* Fix any white backgrounds at the top */
+.stApp > div:first-child {
+    background-color: var(--primary-bg) !important;
+}
+
+/* Target the main header area */
+header[data-testid="stHeader"] {
+    background-color: var(--primary-bg) !important;
+}
+
+header[data-testid="stHeader"] > div {
+    background-color: var(--primary-bg) !important;
+}
+
+/* Fix the top bar */
+.css-1rs6os,
+.css-1rs6os > div,
+.css-1rs6os > div > div {
+    background-color: var(--primary-bg) !important;
+}
+
+/* Additional top stripe fixes */
+.stApp > div:first-child,
+.stApp > div:first-child > div:first-child {
+    background-color: var(--primary-bg) !important;
+}
+
+/* Target the main container */
+.css-1rs6os,
+.css-1rs6os > div,
+.css-1rs6os > div > div,
+.css-1rs6os > div > div > div {
+    background-color: var(--primary-bg) !important;
+}
+
+/* Force dark background on all top elements */
+.stApp > header,
+.stApp > header > div,
+.stApp > header > div > div {
+    background-color: var(--primary-bg) !important;
+}
+
+/* Target any remaining white backgrounds */
+.css-1rs6os,
+.css-1rs6os > div,
+.css-1rs6os > div > div,
+.css-1rs6os > div > div > div,
+.css-1rs6os > div > div > div > div {
+    background-color: var(--primary-bg) !important;
+}
+
+/* Fix the orange gradient line at the top */
+.css-1rs6os::before,
+.css-1rs6os::after,
+.css-1rs6os > div::before,
+.css-1rs6os > div::after {
+    background: var(--gradient-primary) !important;
+}
+
+/* Target the gradient line specifically */
+.css-1rs6os {
+    background: var(--gradient-primary) !important;
+}
+
+/* Override any orange gradients */
+.css-1rs6os,
+.css-1rs6os > div {
+    background: linear-gradient(90deg, #00d4aa 0%, #00b894 100%) !important;
+}
+
+/* Target the top border/line */
+.stApp > header::before,
+.stApp > header::after,
+.css-1rs6os::before,
+.css-1rs6os::after {
+    background: var(--gradient-primary) !important;
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    z-index: 1000;
+}
+
+/* Force green gradient on top elements */
+.stApp > div:first-child {
+    background: var(--gradient-primary) !important;
+}
+
+/* Target any orange gradient elements */
+[style*="orange"],
+[style*="#ff7f0e"],
+[style*="#f39c12"] {
+    background: var(--gradient-primary) !important;
+}
+
+/* More specific targeting for the top gradient line */
+.stApp > div:first-child,
+.stApp > div:first-child > div:first-child {
+    background: linear-gradient(90deg, #00d4aa 0%, #00b894 100%) !important;
+}
+
+/* Target Streamlit's default orange gradient */
+.css-1rs6os {
+    background: linear-gradient(90deg, #00d4aa 0%, #00b894 100%) !important;
+}
+
+/* Override any inline styles with orange gradients */
+div[style*="background: linear-gradient"],
+div[style*="background:linear-gradient"] {
+    background: linear-gradient(90deg, #00d4aa 0%, #00b894 100%) !important;
+}
+
+/* Target the specific orange gradient that Streamlit uses */
+.css-1rs6os,
+.css-1rs6os > div,
+.css-1rs6os > div > div {
+    background: linear-gradient(90deg, #00d4aa 0%, #00b894 100%) !important;
+}
+
+/* Force green gradient on all top-level elements */
+.stApp > div:first-child,
+.stApp > div:first-child > div,
+.stApp > div:first-child > div > div {
+    background: linear-gradient(90deg, #00d4aa 0%, #00b894 100%) !important;
+}
+
+/* Sidebar styling */
+.css-1d391kg {
+    background-color: var(--sidebar-bg) !important;
+    border-right: 1px solid var(--border-color);
+}
+
+.css-1d391kg .css-1v0mbdj {
+    background-color: var(--sidebar-bg) !important;
+}
+
+/* Streamlit sidebar specific selectors */
+section[data-testid="stSidebar"] {
+    background-color: var(--sidebar-bg) !important;
+}
+
+section[data-testid="stSidebar"] > div {
+    background-color: var(--sidebar-bg) !important;
+}
+
+section[data-testid="stSidebar"] .css-1d391kg {
+    background-color: var(--sidebar-bg) !important;
+}
+
+/* Sidebar background */
+.stSidebar {
+    background-color: var(--sidebar-bg) !important;
+}
+
+.stSidebar .css-1d391kg {
+    background-color: var(--sidebar-bg) !important;
+}
+
+/* Force sidebar background */
+div[data-testid="stSidebar"] {
+    background-color: var(--sidebar-bg) !important;
+}
+
+div[data-testid="stSidebar"] > div {
+    background-color: var(--sidebar-bg) !important;
+}
+
+/* Additional sidebar selectors */
+.css-1v0mbdj {
+    background-color: var(--sidebar-bg) !important;
+}
+
+.css-1v0mbdj .css-1d391kg {
+    background-color: var(--sidebar-bg) !important;
+}
+
+/* More specific sidebar targeting */
+.stApp > div:first-child {
+    background-color: var(--sidebar-bg) !important;
+}
+
+.stApp > div:first-child > div:first-child {
+    background-color: var(--sidebar-bg) !important;
+}
+
+/* Target the main sidebar container */
+div[data-testid="stSidebar"] {
+    background-color: var(--sidebar-bg) !important;
+}
+
+div[data-testid="stSidebar"] * {
+    background-color: transparent !important;
+}
+
+/* Override any white backgrounds in sidebar */
+section[data-testid="stSidebar"] * {
+    background-color: transparent !important;
+}
+
+/* Force sidebar background on all elements */
+section[data-testid="stSidebar"],
+section[data-testid="stSidebar"] > div,
+section[data-testid="stSidebar"] > div > div,
+section[data-testid="stSidebar"] .css-1d391kg,
+section[data-testid="stSidebar"] .css-1v0mbdj {
+    background-color: var(--sidebar-bg) !important;
+}
+
+/* Sidebar content area */
+section[data-testid="stSidebar"] .css-1d391kg {
+    background-color: var(--sidebar-bg) !important;
+}
+
+/* Ensure sidebar text is visible */
+section[data-testid="stSidebar"] .stMarkdown,
+section[data-testid="stSidebar"] .stText,
+section[data-testid="stSidebar"] label,
+section[data-testid="stSidebar"] p,
+section[data-testid="stSidebar"] div,
+section[data-testid="stSidebar"] span {
+    color: var(--text-primary) !important;
+}
+
+/* Target specific Streamlit sidebar classes */
+.css-1d391kg,
+.css-1v0mbdj,
+.css-1cypcdb,
+.css-1v0mbdj,
+.css-1d391kg {
+    background-color: var(--sidebar-bg) !important;
+}
+
+/* Override any white backgrounds */
+.css-1d391kg,
+.css-1v0mbdj,
+.css-1cypcdb {
+    background-color: var(--sidebar-bg) !important;
+}
+
+/* Force dark background on sidebar containers */
+div[data-testid="stSidebar"] .css-1d391kg,
+div[data-testid="stSidebar"] .css-1v0mbdj,
+div[data-testid="stSidebar"] .css-1cypcdb {
+    background-color: var(--sidebar-bg) !important;
+}
+
+/* Sidebar content wrapper */
+.css-1d391kg .css-1v0mbdj {
+    background-color: var(--sidebar-bg) !important;
+}
+
+/* Additional sidebar background overrides */
+section[data-testid="stSidebar"] .css-1d391kg,
+section[data-testid="stSidebar"] .css-1v0mbdj,
+section[data-testid="stSidebar"] .css-1cypcdb {
+    background-color: var(--sidebar-bg) !important;
+}
+
+/* Sidebar elements */
+.sidebar .stSelectbox > div > div {
+    background-color: var(--tertiary-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.sidebar .stTextInput > div > div > input {
+    background-color: var(--tertiary-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.sidebar .stButton > button {
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+}
+
+.sidebar .stButton > button:hover {
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Main content area */
+.main .block-container {
+    background: transparent;
+}
+
+/* Headers */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* Streamlit title styling */
+.stApp h1,
+.stApp .stMarkdown h1,
+div[data-testid="stMarkdownContainer"] h1 {
+    color: var(--text-primary) !important;
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    -webkit-text-fill-color: unset !important;
+    background-clip: unset !important;
+}
+
+h1 {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+h2 {
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--accent-color);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Metrics styling */
+.metric-container {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 0.5rem 0;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.metric-container:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent-color);
+}
+
+/* Metric values */
+[data-testid="metric-container"] {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 0.5rem 0;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+
+[data-testid="metric-container"]:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent-color);
+}
+
+[data-testid="metric-container"] [data-testid="metric-value"] {
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+[data-testid="metric-container"] [data-testid="metric-label"] {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+[data-testid="metric-container"] [data-testid="metric-delta"] {
+    font-weight: 600;
+}
+
+/* Data tables */
+.stDataFrame {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+.stDataFrame table {
+    background: var(--card-bg);
+    color: var(--text-primary);
+}
+
+.stDataFrame thead th {
+    background: var(--tertiary-bg);
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 600;
+}
+
+.stDataFrame tbody tr {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.stDataFrame tbody tr:hover {
+    background: var(--accent-bg);
+}
+
+.stDataFrame tbody td {
+    color: var(--text-primary);
+    border-right: 1px solid var(--border-color);
+}
+
+/* Info boxes */
+.stInfo {
+    background: var(--card-bg);
+    border: 1px solid var(--accent-color);
+    border-radius: 12px;
+    color: var(--text-primary);
+}
+
+.stSuccess {
+    background: var(--card-bg);
+    border: 1px solid var(--success-color);
+    border-radius: 12px;
+    color: var(--text-primary);
+}
+
+.stWarning {
+    background: var(--card-bg);
+    border: 1px solid var(--warning-color);
+    border-radius: 12px;
+    color: var(--text-primary);
+}
+
+.stError {
+    background: var(--card-bg);
+    border: 1px solid var(--error-color);
+    border-radius: 12px;
+    color: var(--text-primary);
+}
+
+/* Buttons */
+.stButton > button {
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+}
+
+.stButton > button:hover {
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Select boxes and inputs */
+.stSelectbox > div > div {
+    background-color: var(--tertiary-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 8px;
+}
+
+.stTextInput > div > div > input {
+    background-color: var(--tertiary-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 8px;
+}
+
+.stTextInput > div > div > input:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.2);
+}
+
+/* Checkboxes */
+.stCheckbox > label > div {
+    background-color: var(--tertiary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.stCheckbox > label > div[data-checked="true"] {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+/* Multi-select */
+.stMultiSelect > div > div {
+    background-color: var(--tertiary-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 8px;
+}
+
+/* Spinner */
+.stSpinner {
+    color: var(--accent-color);
+}
+
+/* Plotly chart container */
+.plotly-chart {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: var(--shadow);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--secondary-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--accent-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-hover);
+}
+
+/* Welcome section styling */
+.welcome-section {
+    background: var(--gradient-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    margin: 2rem 0;
+    box-shadow: var(--shadow-lg);
+}
+
+.welcome-section h2 {
+    color: var(--text-primary);
+    border: none;
+    margin-bottom: 1rem;
+}
+
+.welcome-section p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* Feature cards */
+.feature-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+}
+
+.feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent-color);
+}
+
+.feature-card h3 {
+    color: var(--accent-color);
+    margin-bottom: 0.5rem;
+}
+
+.feature-card p {
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Popular tickers section */
+.ticker-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1rem;
+    margin: 0.5rem 0;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+
+.ticker-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent-color);
+}
+
+.ticker-card strong {
+    color: var(--accent-color);
+    font-size: 1.1rem;
+}
+
+.ticker-card p {
+    color: var(--text-secondary);
+    margin: 0.25rem 0 0 0;
+    font-size: 0.9rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .main .block-container {
+        padding: 1rem;
+    }
+    
+    h1 {
+        font-size: 2rem;
+    }
+    
+    .metric-container,
+    [data-testid="metric-container"] {
+        padding: 1rem;
+    }
+}
+
+/* Animation for loading states */
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.loading {
+    animation: pulse 2s infinite;
+}
+
+/* Custom focus styles */
+.stSelectbox > div > div:focus-within,
+.stTextInput > div > div > input:focus,
+.stMultiSelect > div > div:focus-within {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.2);
+}
+
+/* Sidebar specific styles */
+.sidebar .stSelectbox > div > div,
+.sidebar .stTextInput > div > div > input,
+.sidebar .stMultiSelect > div > div {
+    background-color: var(--tertiary-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.sidebar .stSelectbox > div > div:focus-within,
+.sidebar .stTextInput > div > div > input:focus,
+.sidebar .stMultiSelect > div > div:focus-within {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.2);
+}
+
+/* Sidebar text and labels */
+section[data-testid="stSidebar"] .stMarkdown,
+section[data-testid="stSidebar"] .stText,
+section[data-testid="stSidebar"] label,
+section[data-testid="stSidebar"] p,
+section[data-testid="stSidebar"] div {
+    color: var(--text-primary) !important;
+}
+
+/* Sidebar headers */
+section[data-testid="stSidebar"] h1,
+section[data-testid="stSidebar"] h2,
+section[data-testid="stSidebar"] h3,
+section[data-testid="stSidebar"] h4,
+section[data-testid="stSidebar"] h5,
+section[data-testid="stSidebar"] h6 {
+    color: var(--text-primary) !important;
+}
+
+/* Sidebar input labels */
+section[data-testid="stSidebar"] .stTextInput label,
+section[data-testid="stSidebar"] .stSelectbox label,
+section[data-testid="stSidebar"] .stMultiSelect label,
+section[data-testid="stSidebar"] .stCheckbox label {
+    color: var(--text-primary) !important;
+}
+
+/* Sidebar input fields */
+section[data-testid="stSidebar"] .stTextInput > div > div > input,
+section[data-testid="stSidebar"] .stSelectbox > div > div,
+section[data-testid="stSidebar"] .stMultiSelect > div > div {
+    background-color: var(--tertiary-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Sidebar checkboxes */
+section[data-testid="stSidebar"] .stCheckbox > label > div {
+    background-color: var(--tertiary-bg) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+section[data-testid="stSidebar"] .stCheckbox > label > div[data-checked="true"] {
+    background-color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+}
+
+/* Sidebar buttons */
+section[data-testid="stSidebar"] .stButton > button {
+    background: var(--gradient-primary) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 0.5rem 1rem !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    box-shadow: var(--shadow) !important;
+}
+
+section[data-testid="stSidebar"] .stButton > button:hover {
+    background: var(--accent-hover) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-lg) !important;
+}
+
+/* Sidebar metrics */
+section[data-testid="stSidebar"] [data-testid="metric-container"] {
+    background: var(--accent-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    margin: 0.5rem 0 !important;
+}
+
+section[data-testid="stSidebar"] [data-testid="metric-container"] [data-testid="metric-value"] {
+    color: var(--text-primary) !important;
+}
+
+section[data-testid="stSidebar"] [data-testid="metric-container"] [data-testid="metric-label"] {
+    color: var(--text-secondary) !important;
+}
+
+/* Sidebar info boxes */
+section[data-testid="stSidebar"] .stInfo,
+section[data-testid="stSidebar"] .stSuccess,
+section[data-testid="stSidebar"] .stWarning,
+section[data-testid="stSidebar"] .stError {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Sidebar scrollbar */
+section[data-testid="stSidebar"] ::-webkit-scrollbar {
+    width: 8px;
+}
+
+section[data-testid="stSidebar"] ::-webkit-scrollbar-track {
+    background: var(--secondary-bg);
+}
+
+section[data-testid="stSidebar"] ::-webkit-scrollbar-thumb {
+    background: var(--accent-color);
+    border-radius: 4px;
+}
+
+section[data-testid="stSidebar"] ::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-hover);
+}
+
+/* Sidebar headers */
+.sidebar h1,
+.sidebar h2,
+.sidebar h3 {
+    color: var(--text-primary);
+    border: none;
+}
+
+.sidebar .stMarkdown h1,
+.sidebar .stMarkdown h2,
+.sidebar .stMarkdown h3 {
+    color: var(--text-primary);
+    border: none;
+}
+
+/* Sidebar metrics */
+.sidebar [data-testid="metric-container"] {
+    background: var(--accent-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 0.5rem 0;
+}
+
+/* Fix the Streamlit decoration line (stDecoration) */
+div[data-testid="stDecoration"],
+div[data-testid="stDecoration"].css-1dp5vir,
+div[data-testid="stDecoration"].ezrtsby1,
+.css-1dp5vir.ezrtsby1 {
+    background: var(--gradient-primary) !important;
+    background: linear-gradient(90deg, #00d4aa 0%, #00b894 100%) !important;
+    height: 4px !important;
+}
+
+/* Target the decoration element with all possible selectors */
+header[data-testid="stHeader"] div[data-testid="stDecoration"],
+header[data-testid="stHeader"] .css-1dp5vir,
+header[data-testid="stHeader"] .ezrtsby1 {
+    background: linear-gradient(90deg, #00d4aa 0%, #00b894 100%) !important;
+    height: 4px !important;
+}
+
+/* Override any orange/yellow gradients in the decoration */
+div[data-testid="stDecoration"]::before,
+div[data-testid="stDecoration"]::after,
+.css-1dp5vir::before,
+.css-1dp5vir::after,
+.ezrtsby1::before,
+.ezrtsby1::after {
+    background: linear-gradient(90deg, #00d4aa 0%, #00b894 100%) !important;
+}
+
+/* Custom utility classes */
+.text-accent {
+    color: var(--accent-color);
+}
+
+.text-muted {
+    color: var(--text-muted);
+}
+
+.bg-card {
+    background: var(--card-bg);
+}
+
+.border-accent {
+    border-color: var(--accent-color);
+}
+
+/* Enhanced hover effects */
+.interactive:hover {
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+/* Custom chart styling */
+.plotly-chart .js-plotly-plot {
+    background: transparent;
+}
+
+/* Loading spinner customization */
+.stSpinner > div {
+    border-color: var(--accent-color) transparent transparent transparent;
+}
