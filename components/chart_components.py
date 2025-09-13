@@ -221,11 +221,8 @@ class ChartComponent:
             text_color = '#000000'
             title_color = '#1f77b4'
         
-        # Generate title based on company name availability
-        if company_name:
-            title_text = f"{company_name} ({ticker})"
-        else:
-            title_text = f"{ticker} {time_period.upper()} Chart"
+        # Generate title with company name (always provided now)
+        title_text = f"{company_name} ({ticker})" if company_name else f"{ticker} {time_period.upper()} Chart"
         
         self.fig.update_layout(
             title=dict(

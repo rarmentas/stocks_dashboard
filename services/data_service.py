@@ -211,6 +211,34 @@ class DataService:
             logger.error(f"Error calculating metrics: {e}")
             return {}
     
+    def get_company_name(self, ticker: str) -> Optional[str]:
+        """Get company name for a ticker from Yahoo Finance"""
+        try:
+            # Create a yfinance Ticker object
+            stock = yf.Ticker(ticker)
+            
+            # Get company info
+            info = stock.info
+            
+            # Try to get the company name from various possible fields
+            company_name = (
+                info.get('longName') or 
+                info.get('shortName') or 
+                info.get('name') or 
+                info.get('displayName')
+            )
+            
+            if company_name:
+                logger.info(f"Retrieved company name for {ticker}: {company_name}")
+                return company_name
+            else:
+                logger.warning(f"No company name found for {ticker}")
+                return None
+                
+        except Exception as e:
+            logger.error(f"Error getting company name for {ticker}: {e}")
+            return None
+    
     def get_available_tickers(self) -> List[str]:
         """Get list of available tickers from database"""
         try:

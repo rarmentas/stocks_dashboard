@@ -196,8 +196,11 @@ def render_main_dashboard(db_manager, data_service, indicators_service, watchlis
                 # Calculate basic metrics
                 metrics = data_service.calculate_basic_metrics(data)
                 
-                # Get company name from database
+                # Get company name - first try database, then Yahoo Finance
                 company_name = db_manager.get_company_name(ticker)
+                if not company_name:
+                    # If not in database, fetch from Yahoo Finance
+                    company_name = data_service.get_company_name(ticker)
                 
                 # Display main metric (Last Price) above chart
                 components['metrics'].render_price_card_only(metrics, ticker)
